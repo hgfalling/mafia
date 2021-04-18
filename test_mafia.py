@@ -4,20 +4,7 @@ import pytest
 
 import mafia
 from main import new_game, simple_strat
-
-
-def original_strat(gs):
-    # no detectives
-    if gs.time == 0:
-        choices = [x for x in mafia.day_outcomes(gs).keys()]
-        tr = mafia.total_remaining(gs)
-        action = dict([(x, Fraction(gs.players[x[0]], tr)) for x in choices])
-        return action
-    if gs.time == 1:
-        choices = [x for x in mafia.night_outcomes(gs).keys()]
-        tr = mafia.citizens_remaining(gs)
-        action = dict([(x, Fraction(gs.players[x[0]], tr)) for x in choices])
-        return action
+from strategies import original_strat
 
 
 def original_game():
