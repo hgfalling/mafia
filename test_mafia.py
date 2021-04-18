@@ -1,3 +1,5 @@
+import pytest
+
 import mafia
 from main import new_game, simple_strat
 
@@ -40,6 +42,7 @@ def test_simple_strat_original_strat_same():
     assert weight_dict_original == weight_dict_simple
 
 
+@pytest.mark.skip(reason="Aspirational test")
 def test_can_play_detective():
     pl, gs, games = new_game(2, 18, 1, 0)
     weight_dict = mafia.eval_strat_rc(games, simple_strat)
@@ -66,6 +69,7 @@ def test_leaves_match_children():
                 assert len(targets) == 1
 
 
+@pytest.mark.skip(reason="Aspirational test")
 def test_strategy_with_detective_sum_is_one():
     pl, gs, games = new_game(2, 4, 1, 0)
     mgs, cgs, dgs = [
