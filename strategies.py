@@ -17,7 +17,7 @@ def original_strat(gs):
         return action
 
 
-def simple_strat(gs):
+def incomplete_detective(gs):
     # no detectives
     if gs.time == 0:
         choices = [x for x in mafia.day_outcomes(gs).keys()]

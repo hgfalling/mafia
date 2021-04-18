@@ -2,7 +2,7 @@ import mafia
 import collections
 from fractions import Fraction
 
-from strategies import simple_strat
+from strategies import incomplete_detective
 
 
 def get_all_incomplete_gs(games):
@@ -77,9 +77,9 @@ dpl, dgs, dgame = new_game(2, 5, 1, 0)
 cs = get_all_choices(dgame)
 
 pl, gs, games = new_game(2, 19, 0, 0)
-weight_dict = mafia.eval_strat_rc(games, simple_strat)
+weight_dict = mafia.eval_strat_rc(games, incomplete_detective)
 mafia_win, citizen_win = mafia.winner_probabilities(games, weight_dict)
 print(mafia_win, citizen_win)
 
 igs = get_all_incomplete_gs(dgame)
-strat_out = [simple_strat(i) for i in igs]
+strat_out = [incomplete_detective(i) for i in igs]
