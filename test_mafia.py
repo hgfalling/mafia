@@ -3,8 +3,8 @@ from fractions import Fraction
 import pytest
 
 import mafia
-from main import new_game, incomplete_detective
-from strategies import original_strat
+from main import new_game
+from strategies import original_strat, incomplete_detective, proper_detective
 
 
 def original_game():
@@ -80,3 +80,21 @@ def test_incomplete_detective_same_as_no_detective():
     assert mafia.winner_probabilities(games, gwd) == mafia.winner_probabilities(
         dgames, dwd
     )
+
+
+def test_can_play_proper_detective():
+    pl, gs, games = new_game(2, 18, 1, 0)
+    weight_dict = mafia.eval_strat_rc(games, proper_detective)
+    mafia_win, citizen_win = mafia.winner_probabilities(games, weight_dict)
+    assert mafia_win + citizen_win == 1
+
+
+@pytest.mark.skip(reason="Aspirational")
+def test_proper_detective_beats_incomplete_detective():
+    _, _, games = new_game(2, 18, 1, 0)
+    idwd = mafia.eval_strat_rc(games, incomplete_detective)
+    pdwd = mafia.eval_strat_rc(games, proper_detective)
+    imw, icw = mafia.winner_probabilities(games, idwd)
+    pmw, pcw = mafia.winner_probabilities(games, pdwd)
+    # proper detective wins more often
+    assert pcw > icw
