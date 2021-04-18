@@ -2,6 +2,7 @@ import treelib
 import typing
 import enum
 import collections
+from fractions import Fraction
 
 
 class PType(enum.IntEnum):
@@ -591,7 +592,7 @@ def apply_strat(game, node, day, fstrat, weight_dict):
     if node.is_leaf():
         return
     elif nid == ("root" + str(node.data[1].day - 1)):
-        weight_dict["root" + str(day)] = 1.0
+        weight_dict["root" + str(day)] = Fraction(1, 1)
         if day > 0:
             return
     outcomes = fstrat(node.data[1])
@@ -603,7 +604,7 @@ def apply_strat(game, node, day, fstrat, weight_dict):
 
 
 def eval_strat_rc(games, fstrat):
-    weight_dict = collections.defaultdict(float)
+    weight_dict = collections.defaultdict(Fraction)
     for idx, t in enumerate(games):
         for node in t.expand_tree(mode=t.WIDTH):
             apply_strat(games[idx], t[node], idx, fstrat, weight_dict)

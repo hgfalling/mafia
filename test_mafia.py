@@ -1,3 +1,5 @@
+from fractions import Fraction
+
 import pytest
 
 import mafia
@@ -9,12 +11,12 @@ def original_strat(gs):
     if gs.time == 0:
         choices = [x for x in mafia.day_outcomes(gs).keys()]
         tr = mafia.total_remaining(gs)
-        action = dict([(x, gs.players[x[0]] / tr) for x in choices])
+        action = dict([(x, Fraction(gs.players[x[0]], tr)) for x in choices])
         return action
     if gs.time == 1:
         choices = [x for x in mafia.night_outcomes(gs).keys()]
         tr = mafia.citizens_remaining(gs)
-        action = dict([(x, gs.players[x[0]] / tr) for x in choices])
+        action = dict([(x, Fraction(gs.players[x[0]], tr)) for x in choices])
         return action
 
 
@@ -31,8 +33,8 @@ def test_nothing():
 def test_winner_probabilities():
     pl, gs, games, weight_dict = original_game()
     mafia_win, citizen_win = mafia.winner_probabilities(games, weight_dict)
-    assert mafia_win == 0.49290131952670657
-    assert citizen_win == 0.5070986804732934
+    assert mafia_win == Fraction(478099, 969969)
+    assert citizen_win == Fraction(491870, 969969)
 
 
 def test_simple_strat_original_strat_same():
