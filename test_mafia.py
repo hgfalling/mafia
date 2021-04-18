@@ -14,19 +14,8 @@ def test_nothing():
     assert 1 == 1
 
 
-def test_original_game():
+def test_winner_probabilities():
     pl, gs, games, weight_dict = original_game()
-    cleaves = []
-    mleaves = []
-    for g in games:
-        cleaves.extend(
-            [x.identifier for x in g.leaves() if mafia.winner(x.data[1]) == 1]
-        )
-        mleaves.extend(
-            [x.identifier for x in g.leaves() if mafia.winner(x.data[1]) == -1]
-        )
-
-    mafia_win = sum([weight_dict[x] for x in mleaves])
-    citizen_win = sum([weight_dict[x] for x in cleaves])
+    mafia_win, citizen_win = mafia.winner_probabilities(games, weight_dict)
     assert mafia_win == 0.49290131952670657
     assert citizen_win == 0.5070986804732934

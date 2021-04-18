@@ -613,3 +613,15 @@ def eval_strat_rc(games, fstrat):
                 ][0]
                 weight_dict[target] += weight_dict[node.identifier]
     return weight_dict
+
+
+def winner_probabilities(games, weight_dict):
+    cleaves = []
+    mleaves = []
+    for g in games:
+        cleaves.extend([x.identifier for x in g.leaves() if winner(x.data[1]) == 1])
+        mleaves.extend([x.identifier for x in g.leaves() if winner(x.data[1]) == -1])
+
+    mafia_win = sum([weight_dict[x] for x in mleaves])
+    citizen_win = sum([weight_dict[x] for x in cleaves])
+    return mafia_win, citizen_win
