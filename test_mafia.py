@@ -66,3 +66,16 @@ def test_leaves_match_children():
                 assert len(targets) == 1
 
 
+def test_strategy_with_detective_sum_is_one():
+    pl, gs, games = new_game(2, 4, 1, 0)
+    mgs, cgs, dgs = [
+        x.data[1]
+        for x in games[0].children(games[0].root)
+        if x.data[0] != "Detective Out"
+    ]
+    mgs_outcomes = simple_strat(mgs)
+    cgs_outcomes = simple_strat(cgs)
+    dgs_outcomes = simple_strat(dgs)
+    assert sum(mgs_outcomes.values()) == 1
+    assert sum(cgs_outcomes.values()) == 1
+    assert sum(dgs_outcomes.values()) == 1
