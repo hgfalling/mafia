@@ -219,6 +219,11 @@ def gs_choices(gs: Gamestate) -> list:
         else:
             dchoices = [None]
 
+        if not dchoices:
+            # if the detective is alive, but there are no peekable types left
+            # then dchoices is an empty list, and this causes a problem later
+            dchoices = [None]
+
         if bodyguard_alive(gs):
             bchoices = []
             for ptype in PType:

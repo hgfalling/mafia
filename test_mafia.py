@@ -45,3 +45,24 @@ def test_can_play_detective():
     weight_dict = mafia.eval_strat_rc(games, simple_strat)
     mafia_win, citizen_win = mafia.winner_probabilities(games, weight_dict)
     assert mafia_win + citizen_win == 1
+
+
+def test_leaves_match_children():
+    """
+    All leaves that aren't game ending should have a corresponding starter node
+    in the next days' game tree. This isn't checked right now until a strategy
+    is evaluated.
+    """
+    pl, gs, games = new_game(2, 18, 1, 0)
+    for idx, t in enumerate(games):
+        for node in t.leaves():
+            if mafia.winner(node.data[1]) != 0:
+                continue
+            else:
+                targets = []
+                for x in games[idx + 1].children(games[idx + 1].root):
+                    if x.data[1] == node.data[1]:
+                        targets.append(x.identifier)
+                assert len(targets) == 1
+
+
