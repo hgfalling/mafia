@@ -33,6 +33,13 @@ def test_winner_probabilities():
     assert citizen_win == 0.5070986804732934
 
 
+def test_simple_strat_original_strat_same():
+    pl, gs, games = new_game(2, 19, 0, 0)
+    weight_dict_original = mafia.eval_strat_rc(games, original_strat)
+    weight_dict_simple = mafia.eval_strat_rc(games, simple_strat)
+    assert weight_dict_original == weight_dict_simple
+
+
 def test_can_play_detective():
     pl, gs, games = new_game(2, 18, 1, 0)
     weight_dict = mafia.eval_strat_rc(games, simple_strat)
