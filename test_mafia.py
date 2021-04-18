@@ -1,11 +1,9 @@
 import mafia
-from main import simple_strat
+from main import new_game, simple_strat
 
 
 def original_game():
-    pl = mafia.Players(2, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0)
-    gs = mafia.Gamestate(1, 0, None, pl)
-    games = mafia.make_game(pl, gs)
+    pl, gs, games = new_game(2, 19, 0, 0)
     weight_dict = mafia.eval_strat_rc(games, simple_strat)
     return pl, gs, games, weight_dict
 
