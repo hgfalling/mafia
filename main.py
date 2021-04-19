@@ -78,18 +78,24 @@ def frac_to_pct(frac):
     return rf.numerator / rf.denominator
 
 
-dpl, dgs, dgame = new_game(2, 18, 1, 0)
-cs = get_all_choices(dgame)
+def example_no_detective():
+    pl, gs, games = new_game(2, 19, 0, 0)
+    weight_dict = mafia.eval_strat_rc(games, incomplete_detective)
+    mafia_win, citizen_win = mafia.winner_probabilities(games, weight_dict)
+    print(frac_to_pct(mafia_win), frac_to_pct(citizen_win))
 
-pl, gs, games = new_game(2, 19, 0, 0)
-weight_dict = mafia.eval_strat_rc(games, incomplete_detective)
-mafia_win, citizen_win = mafia.winner_probabilities(games, weight_dict)
-print(mafia_win, citizen_win)
 
-igs = get_all_incomplete_gs(dgame)
-strat_out = [incomplete_detective(i) for i in igs]
+def example_with_detective():
+    pl, gs, games = new_game(2, 18, 1, 0)
+    weight_dict = mafia.eval_strat_rc(games, incomplete_detective)
+    mafia_win, citizen_win = mafia.winner_probabilities(games, weight_dict)
+    print(mafia_win, citizen_win)
+
+
+pl, gs, games = new_game(2, 4, 1, 0)
+choices = get_all_choices(games)
+igs = get_all_incomplete_gs(games)
+strat_decisions = [proper_detective(i) for i in igs]
 
 # game states where a mafia has been peeked and it's night time
-peekgs = [i for i in igs if i.players[mafia.PType.PeekedMafia] > 0 and i.time == 0]
-
-mafia.eval_strat_rc(dgame, proper_detective)
+# peekgs = [i for i in igs if i.players[mafia.PType.PeekedMafia] > 0 and i.time == 0]
