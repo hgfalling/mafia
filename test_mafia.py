@@ -89,7 +89,6 @@ def test_can_play_proper_detective():
     assert mafia_win + citizen_win == 1
 
 
-@pytest.mark.skip(reason="Aspirational")
 def test_proper_detective_beats_incomplete_detective():
     _, _, games = new_game(2, 18, 1, 0)
     idwd = mafia.eval_strat_rc(games, incomplete_detective)

@@ -90,21 +90,54 @@ def incomplete_detective(gs):
         return action
 
 
+def is_time_to_come_out(gs):
+    """
+    If Detective is alive and there is a PeekedMafia
+    come out 100% of the time. Otherwise, don't come out
+    """
+    has_detective = mafia.detective_alive(gs)
+    has_peeks = gs.players[mafia.PType.PeekedMafia] > 0
+    is_day = gs.time == 0
+    return all([has_detective, has_peeks, is_day])
+
+
 def proper_detective(gs):
     """
-    I copied incomplete detective so I could work on this. Despite
-    the name of the function, it's still incomplete.
+    1. If there's a PeekedMafia, always come out
+    2. If there's a VerifiedMafia, citizens will always kill
+    3. If there's a VerifiedCitizen, citizens will never kill (todo)
+    4. If there's a VerifiedDetective, mafia will always assasinate (todo)
+    5. If there's a VerifiedCitizen, and detective is dead, mafia will always assasinate (todo)
     """
     if gs.time == 0:
         choices = [x for x in mafia.day_outcomes(gs).keys()]
-        tr = mafia.total_remaining(gs)
-        action = dict(
-            [
-                (x, Fraction(gs.players[x[0]], tr))
-                for x in choices
-                if x != "Detective Out"
-            ]
-        )
+        action = {}
+        if is_time_to_come_out(gs):
+            assert "Detective Out" in choices
+            for c in choices:
+                if c == "Detective Out":
+                    action[c] = Fraction(1, 1)
+                else:
+                    action[c] = Fraction(0, 1)
+        else:
+            # if there's a verifiedmafia, kill them first!
+            if gs.players[mafia.PType.VerifiedMafia] > 0:
+                for c in choices:
+                    if c == "Detective Out":
+                        action[c] = Fraction()
+                    else:
+                        if c[0] == mafia.PType.VerifiedMafia:
+                            action[c] = Fraction(1, 1)
+                        else:
+                            action[c] = Fraction(0, 1)
+            else:
+                tr = mafia.total_remaining(gs)
+                for x in choices:
+                    if x == "Detective Out":
+                        # Never come out
+                        action[x] = Fraction()
+                    else:
+                        action[x] = Fraction(gs.players[x[0]], tr)
         return action
     if gs.time == 1:
         # get all the choices for this round

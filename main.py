@@ -2,7 +2,7 @@ import mafia
 import collections
 from fractions import Fraction
 
-from strategies import incomplete_detective
+from strategies import incomplete_detective, proper_detective
 
 
 def get_all_incomplete_gs(games):
@@ -73,7 +73,12 @@ def new_game(num_mafia, num_citizen, num_detective, num_bodyguard):
     return pl, gs, games
 
 
-dpl, dgs, dgame = new_game(2, 5, 1, 0)
+def frac_to_pct(frac):
+    rf = round(frac, 4)
+    return rf.numerator / rf.denominator
+
+
+dpl, dgs, dgame = new_game(2, 18, 1, 0)
 cs = get_all_choices(dgame)
 
 pl, gs, games = new_game(2, 19, 0, 0)
@@ -83,3 +88,8 @@ print(mafia_win, citizen_win)
 
 igs = get_all_incomplete_gs(dgame)
 strat_out = [incomplete_detective(i) for i in igs]
+
+# game states where a mafia has been peeked and it's night time
+peekgs = [i for i in igs if i.players[mafia.PType.PeekedMafia] > 0 and i.time == 0]
+
+mafia.eval_strat_rc(dgame, proper_detective)
