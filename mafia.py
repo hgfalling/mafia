@@ -155,6 +155,10 @@ def detective_alive(x: Gamestate) -> bool:
     return sum(x.players[PType.Detective : PType.Bodyguard]) > 0
 
 
+def detective_is_already_out(gs: Gamestate) -> bool:
+    return gs.players[PType.VerifiedDetective] > 0
+
+
 def winner(gs: Gamestate) -> int:
     """1 = town, 0 = not over, -1 = mafia"""
     mr = mafia_remaining(gs)
@@ -445,10 +449,22 @@ def night_outcomes(gs: Gamestate):
                             ] = Gamestate(gs.day + 1, 0, bg_protect, new_players)
 
     for key, val in outcomes.items():
+        # if the detective dies, undo all the peeks
         if not detective_alive(val):
             gsp = list(val.players)
             for ptype in peeked_types():
                 gsp[unpeeked_version(ptype)] += gsp[ptype]
+                gsp[ptype] = 0
+            outcomes[key] = Gamestate(
+                day=val.day,
+                time=val.time,
+                last_protected=val.last_protected,
+                players=Players(*tuple(gsp)),
+            )
+        if detective_is_already_out(val):
+            gsp = list(val.players)
+            for ptype in peeked_types():
+                gsp[verified_version(ptype)] += gsp[ptype]
                 gsp[ptype] = 0
             outcomes[key] = Gamestate(
                 day=val.day,
