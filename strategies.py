@@ -138,6 +138,7 @@ def proper_detective(gs):
                         action[x] = Fraction()
                     else:
                         action[x] = Fraction(gs.players[x[0]], tr)
+        assert sum(action.values()) == 1
         return action
     if gs.time == 1:
         # get all the choices for this round
