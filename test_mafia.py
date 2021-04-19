@@ -3,7 +3,7 @@ from fractions import Fraction
 import pytest
 
 import mafia
-from main import new_game
+from main import new_game, get_all_incomplete_gs
 from strategies import original_strat, incomplete_detective, proper_detective
 
 
@@ -98,3 +98,16 @@ def test_proper_detective_beats_incomplete_detective():
     pmw, pcw = mafia.winner_probabilities(games, pdwd)
     # proper detective wins more often
     assert pcw > icw
+
+
+def test_all_peeks_verified_after_detective_out():
+    dpl, dgs, dgame = new_game(2, 5, 1, 0)
+    igs = get_all_incomplete_gs(dgame)
+    bad_states = []
+    for i in igs:
+        if (
+            i.players[mafia.PType.PeekedMafia] > 0
+            or i.players[mafia.PType.PeekedCitizen] > 0
+        ) and i.players[mafia.PType.VerifiedDetective] > 0:
+            bad_states.append(i)
+    assert len(bad_states) == 0
