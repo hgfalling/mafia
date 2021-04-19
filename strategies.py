@@ -19,12 +19,15 @@ def original_strat(gs):
 
 def incomplete_detective(gs):
     """
-    This detective is incomplete in two ways
+    This detective is incomplete in several ways... its purpose was that it should
+    not crash with a detective in the game, and should have
+    the same strategy results as original_strat with the same number of citizens+detectives
     1. All "Detective Out" branches are ignored
     2. The case where mafia kill and detective peek the same type
        we ignore one case (assign it probability zero)
     3. (As a consequence above) neither Mafia or Citizen do anything different
        because the detective is in the game
+
     """
     if gs.time == 0:
         choices = [x for x in mafia.day_outcomes(gs).keys()]
