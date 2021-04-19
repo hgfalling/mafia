@@ -67,6 +67,10 @@ def is_peeked(x: PType) -> bool:
     return x in [2, 5, 11]
 
 
+def is_suspicious(x: PType) -> bool:
+    return x in [0, 2, 3, 5, 6, 9, 11]
+
+
 def peekable_types() -> typing.Tuple[PType, PType, PType]:
     return (PType.Mafia, PType.Bodyguard, PType.Citizen)
 
@@ -145,6 +149,22 @@ def mafia_remaining(x: Gamestate) -> int:
 
 def citizens_remaining(x: Gamestate) -> int:
     return sum(x.players[PType.Citizen :])
+
+
+def suspicious_remaining(x: Gamestate) -> int:
+    """
+    Suspicious is anyone who _could_ be mafia, in other words,
+    not verified safe
+    """
+    return (
+        x.players[PType.Mafia]
+        + x.players[PType.PeekedMafia]
+        + x.players[PType.Citizen]
+        + x.players[PType.PeekedCitizen]
+        + x.players[PType.Detective]
+        + x.players[PType.Bodyguard]
+        + x.players[PType.PeekedBodyguard]
+    )
 
 
 def bodyguard_alive(x: Gamestate) -> bool:
