@@ -82,20 +82,40 @@ def example_no_detective():
     pl, gs, games = new_game(2, 19, 0, 0)
     weight_dict = mafia.eval_strat_rc(games, incomplete_detective)
     mafia_win, citizen_win = mafia.winner_probabilities(games, weight_dict)
-    print(frac_to_pct(mafia_win), frac_to_pct(citizen_win))
+    # ~0.4929 0.5071
+    print("No Detective:", frac_to_pct(mafia_win), frac_to_pct(citizen_win))
 
 
-def example_with_detective():
+def example_with_incomplete_detective():
     pl, gs, games = new_game(2, 18, 1, 0)
     weight_dict = mafia.eval_strat_rc(games, incomplete_detective)
     mafia_win, citizen_win = mafia.winner_probabilities(games, weight_dict)
-    print(mafia_win, citizen_win)
+    # ~0.4929 0.5071
+    print("Incomplete", frac_to_pct(mafia_win), frac_to_pct(citizen_win))
 
 
+def example_with_proper_detective():
+    pl, gs, games = new_game(2, 18, 1, 0)
+    weight_dict = mafia.eval_strat_rc(games, proper_detective)
+    mafia_win, citizen_win = mafia.winner_probabilities(games, weight_dict)
+    # ~0.3587 0.6413 (after capabilities 1&2, did and should make citizen stronger)
+    # ~0.343 0.657 (after capability 3&4, did and should make citizens stronger)
+    # ~0.3902 0.6098 (after capability 5&6, did and should make mafia stronger)
+    # note the above dont mean a lot because capability 7
+    # was kind of important
+    # ~0.3595 0.6405 (after capability 7, did and should make citizens stronger)
+    print("Proper:", frac_to_pct(mafia_win), frac_to_pct(citizen_win))
+
+
+example_no_detective()
+example_with_incomplete_detective()
+example_with_proper_detective()
+
+# create a small game so the tree is easy to inspect
 pl, gs, games = new_game(2, 4, 1, 0)
 choices = get_all_choices(games)
 igs = get_all_incomplete_gs(games)
-strat_decisions = [proper_detective(i) for i in igs]
-
-# game states where a mafia has been peeked and it's night time
-# peekgs = [i for i in igs if i.players[mafia.PType.PeekedMafia] > 0 and i.time == 0]
+dgs = [i for i in igs if i.time == 0]
+ngs = [i for i in igs if i.time == 1]
+day_decisions = [proper_detective(i) for i in dgs]
+night_decisions = [proper_detective(i) for i in ngs]

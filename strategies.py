@@ -105,9 +105,11 @@ def proper_detective(gs):
     """
     1. If there's a PeekedMafia, always come out
     2. If there's a VerifiedMafia, citizens will always kill
-    3. If there's a VerifiedCitizen, citizens will never kill (todo)
-    4. If there's a VerifiedDetective, mafia will always assasinate (todo)
-    5. If there's a VerifiedCitizen, and detective is dead, mafia will always assasinate (todo)
+    3. If there's a VerifiedCitizen, citizens will never kill
+    4. If there's a VerifiedDetective, citizens will never kill
+    5. If there's a VerifiedDetective, mafia will always assasinate (todo)
+    6. If there's a VerifiedCitizen, and no VerifiedDetective, mafia will always assasinate (todo)
+    7. Correctly assign random chances to the case when mafia assasinate and detective peek the same type (todo)
     """
     if gs.time == 0:
         choices = [x for x in mafia.day_outcomes(gs).keys()]
@@ -131,13 +133,19 @@ def proper_detective(gs):
                         else:
                             action[c] = Fraction(0, 1)
             else:
-                tr = mafia.total_remaining(gs)
+                # Get the total remaining, excluding those who are verified safe
+                sr = mafia.suspicious_remaining(gs)
                 for x in choices:
                     if x == "Detective Out":
                         # Never come out
                         action[x] = Fraction()
                     else:
-                        action[x] = Fraction(gs.players[x[0]], tr)
+                        if not mafia.is_suspicious(x[0]):
+                            # Never kill someone who is verified safe
+                            action[x] = Fraction()
+                        else:
+                            # For everyone else, choose randomly with an equal chance
+                            action[x] = Fraction(gs.players[x[0]], sr)
         assert sum(action.values()) == 1
         return action
     if gs.time == 1:
@@ -148,12 +156,30 @@ def proper_detective(gs):
         kill_choices = set([c[0] for c in choices])
         # and get the total number of possible kills
         total_killable = mafia.citizens_remaining(gs)
-        # get the probability each unique kill choice will be chosen
+
+        # go for verified detective
+        # if there isnt one, go for verifieddetective
+        # if there isnt one, then get probability for each kill choice by how common
         kill_chances = {}
-        for kc in kill_choices:
-            num_remaining = gs.players[kc]
-            # kill_chances[kc] = num_remaining / total_killable
-            kill_chances[kc] = Fraction(num_remaining, total_killable)
+        # if there is a verifieddetective, kill it 100% of the time
+        if mafia.PType.VerifiedDetective in kill_choices:
+            for kc in kill_choices:
+                if kc == mafia.PType.VerifiedDetective:
+                    kill_chances[kc] = Fraction(1, 1)
+                else:
+                    kill_chances[kc] = Fraction(0, 1)
+        elif mafia.PType.VerifiedCitizen in kill_choices:
+            for kc in kill_choices:
+                if kc == mafia.PType.VerifiedCitizen:
+                    kill_chances[kc] = Fraction(1, 1)
+                else:
+                    kill_chances[kc] = Fraction(0, 1)
+        else:
+            # get the probability each unique kill choice will be chosen
+            for kc in kill_choices:
+                num_remaining = gs.players[kc]
+                # kill_chances[kc] = num_remaining / total_killable
+                kill_chances[kc] = Fraction(num_remaining, total_killable)
         # this should add up to 1
         assert sum(kill_chances.values()) == 1
 
@@ -183,11 +209,23 @@ def proper_detective(gs):
                 # this means this choice has an additional index
                 # i.e. sometimes detective peeks same person mafia kills, etc.
                 # as to keep probabilities right, only take the first option
-                if c[3] != 0:
-                    action[c] = 0
-                    continue
-            # the probability of this action is the probability this type will be killed
-            # multiplied by the probability this type will be peeked
-            action[c] = kill_chances[killed] * peek_chances[peeked]
+                # c[3] == 0 means that the peeked player was killed
+                # c[3] == 1 means that they hit two different ones
+                case_idx = c[3]
+                assert case_idx in (0, 1)
+                assert killed == peeked  # i think this is always true
+                assert (
+                    gs.players[killed] == gs.players[peeked]
+                )  # so this is always true
+                chance_it_is_the_same_player = Fraction(1, gs.players[killed])
+                chance_it_isnt = 1 - chance_it_is_the_same_player
+                case_chances = {0: chance_it_is_the_same_player, 1: chance_it_isnt}
+                action[c] = (
+                    kill_chances[killed] * peek_chances[peeked] * case_chances[case_idx]
+                )
+            else:
+                # the probability of this action is the probability this type will be killed
+                # multiplied by the probability this type will be peeked
+                action[c] = kill_chances[killed] * peek_chances[peeked]
         assert sum(action.values()) == 1
         return action
