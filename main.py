@@ -40,7 +40,7 @@ def get_all_choices(games):
                 for k, v in mafia.night_outcomes(node.data[1]).items():
                     choices.append({"before": node.data[1], "choice": k, "after": v})
             else:
-                assert 1 == 0
+                raise Exception("This case should not happen")
     return choices
 
 

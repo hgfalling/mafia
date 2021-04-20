@@ -99,9 +99,12 @@ def is_time_to_come_out(gs):
     come out 100% of the time. Otherwise, don't come out
     """
     has_detective = mafia.detective_alive(gs)
+    detective_not_already_out = (
+        gs.players[mafia.PType.VerifiedDetective] == 0
+    )  # May not be necessary since if the detective is out we should have no peeks (they are all verified), but just in case...
     has_peeks = gs.players[mafia.PType.PeekedMafia] > 0
     is_day = gs.time == 0
-    return all([has_detective, has_peeks, is_day])
+    return all([has_detective, detective_not_already_out, has_peeks, is_day])
 
 
 def proper_detective(gs):
@@ -110,9 +113,9 @@ def proper_detective(gs):
     2. If there's a VerifiedMafia, citizens will always kill
     3. If there's a VerifiedCitizen, citizens will never kill
     4. If there's a VerifiedDetective, citizens will never kill
-    5. If there's a VerifiedDetective, mafia will always assasinate (todo)
-    6. If there's a VerifiedCitizen, and no VerifiedDetective, mafia will always assasinate (todo)
-    7. Correctly assign random chances to the case when mafia assasinate and detective peek the same type (todo)
+    5. If there's a VerifiedDetective, mafia will always assasinate
+    6. If there's a VerifiedCitizen, and no VerifiedDetective, mafia will always assasinate
+    7. Correctly assign random chances to the case when mafia assasinate and detective peek the same type
     """
     if gs.time == 0:
         choices = [x for x in mafia.day_outcomes(gs).keys()]
